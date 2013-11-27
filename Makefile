@@ -15,7 +15,7 @@ pdf: clean $(PDFS)
 
 
 
-analysis: grefs/Bombyx_exons.fas data/DpleKU_DAS5_blastn_out.csv fig_blast_identity.png data/new_blastn_out.csv data/DpleKU_DAS5.fa output/gene*fasta grefs/Danaus_exons.fasta output/merged*fasta
+analysis: grefs/Bombyx_exons.fas data/DpleKU_DAS5_blastn_out.csv fig_blast_identity.png data/new_blastn_out.csv data/DpleKU_DAS5.fa output/gene*fasta grefs/Danaus_exons.fasta output/merged*fasta output/*aligned.fasta
 	
 
 grefs/Bombyx_exons.fas: grefs/silkgenome.fa grefs/silkcds.fa grefs/OrthoDB7_Arthropoda_tabtext code/search_genes_from_Bmori.py
@@ -51,8 +51,10 @@ grefs/Danaus_exons.fasta: grefs/Bombyx_exons.fas grefs/Dp_genome_v2.fasta code/g
 
 output/merged%fasta: output/gene*fasta code/merge_files_with_homologous_seqs.py grefs/Danaus_exons.fasta
 	python code/merge_files_with_homologous_seqs.py
+
 # align sequences
-	
+output/%aligned.fasta: output/merged*fasta
+	ls output/merged_gene_BGIBMGA0* | parallel -I {} muscle -in {} -out {}_aligned.fasta	
 
 clean:
 	rm -rf *pdf *docx
