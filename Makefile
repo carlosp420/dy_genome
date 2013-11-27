@@ -15,7 +15,8 @@ pdf: clean $(PDFS)
 
 
 
-analysis: grefs/Bombyx_exons.fas data/DpleKU_DAS5_blastn_out.csv fig_blast_identity.png data/new_blastn_out.csv data/DpleKU_DAS5.fa output/gene*fasta
+analysis: grefs/Bombyx_exons.fas data/DpleKU_DAS5_blastn_out.csv fig_blast_identity.png data/new_blastn_out.csv data/DpleKU_DAS5.fa output/gene*fasta grefs/Danaus_exons.fasta
+	
 
 grefs/Bombyx_exons.fas: grefs/silkgenome.fa grefs/silkcds.fa grefs/OrthoDB7_Arthropoda_tabtext code/search_genes_from_Bmori.py
 	python code/search_genes_from_Bmori.py
@@ -45,7 +46,8 @@ output/gene%fasta: code/parse_blast_results.py data/new_blastn_out.csv data/Dple
 	python code/remove_gene_bins_with_more_than_1_sequence.py
 
 # get the sequences for Danaus from the set of Bmori genes
-
+grefs/Danaus_exons.fasta: grefs/Bombyx_exons.fas grefs/Dp_genome_v2.fasta code/get_danaus_seqs.py
+	python code/get_danaus_seqs.py
 
 
 clean:
