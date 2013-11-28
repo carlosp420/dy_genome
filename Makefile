@@ -52,9 +52,14 @@ grefs/Danaus_exons.fasta: grefs/Bombyx_exons.fas grefs/Dp_genome_v2.fasta code/g
 output/merged%fasta: output/gene*fasta code/merge_files_with_homologous_seqs.py grefs/Danaus_exons.fasta
 	python code/merge_files_with_homologous_seqs.py
 
+# Use BLAST to get sequences in the same direction
+
+
 # align sequences
 output/%aligned.fasta: output/merged*fasta
 	ls output/merged_gene_BGIBMGA0* | parallel -I {} muscle -in {} -out {}_aligned.fasta	
+
+
 
 clean:
 	rm -rf *pdf *docx
