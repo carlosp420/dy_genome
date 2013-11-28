@@ -9,13 +9,13 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 
 
-infile = sys.argv[1].strip()
 
 if len(sys.argv) < 2:
     print """This script takes as input a FASTA file and will put all sequences
-            in same direction using blast results. It replaces the input file."""
+            in same direction using blast results."""
     sys.exit()
 
+infile = sys.argv[1].strip()
 BLAST.blastn(infile, infile)
 
 # remove BLAST files
@@ -49,22 +49,29 @@ def get_this_sequence(id, infile):
 
 
 sequences = []
+ids = []
 for line in lines:
     line = line.strip().split(",")
     if line[0] != line[1]:
         # direction of query and subject
         if int(line[7]) > int(line[8]):
             # reverse
-            print "Do reverse of %s" % str(line[0])
-            sequences.append(reverse(line[0], infile))
+            record = reverse(line[0], infile)
+            if record.id not in ids:
+                print "Appending reverse of %s" % str(line[0])
+                sequences.append(record)
+                ids.append(record.id)
         else:
-            print "Dont reverse %s" % str(line[0])
-            sequences.append(get_this_sequence(line[0], infile))
+            record = get_this_sequence(line[0], infile)
+            if record.id not in ids:
+                print "Appendig unchanged %s" % str(line[0])
+                sequences.append(record)
+                ids.append(record.id)
 
 
 # write sequences to infile
 print "We have %i sequences to process" % len(sequences)
-f = open(infile, "w")
+f = open(infile + "sd.fasta", "w")
 for i in sequences:
     if i != None:
         f.write(">" + str(i.id) + "\n")

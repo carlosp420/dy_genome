@@ -15,8 +15,7 @@ pdf: clean $(PDFS)
 
 
 
-analysis: grefs/Bombyx_exons.fas data/DpleKU_DAS5_blastn_out.csv fig_blast_identity.png data/new_blastn_out.csv data/DpleKU_DAS5.fa output/gene*fasta grefs/Danaus_exons.fasta output/merged*fasta output/*aligned.fasta
-	
+analysis: grefs/Bombyx_exons.fas data/DpleKU_DAS5_blastn_out.csv fig_blast_identity.png data/new_blastn_out.csv data/DpleKU_DAS5.fa output/gene*fasta grefs/Danaus_exons.fasta output/merged*fasta output/*aligned.fasta output/recovered_seqs/*fasta
 
 grefs/Bombyx_exons.fas: grefs/silkgenome.fa grefs/silkcds.fa grefs/OrthoDB7_Arthropoda_tabtext code/search_genes_from_Bmori.py
 	python code/search_genes_from_Bmori.py
@@ -53,12 +52,17 @@ output/merged%fasta: output/gene*fasta code/merge_files_with_homologous_seqs.py 
 	python code/merge_files_with_homologous_seqs.py
 
 # Use BLAST to get sequences in the same direction
-
+output/%sd.fasta: code/get_seqs_same_direction.py output/merged*fasta
+	ls output/merged_gene_BG* | parallel -I {} python code/get_seqs_same_direction.py {}
 
 # align sequences
-output/%aligned.fasta: output/merged*fasta
-	ls output/merged_gene_BGIBMGA0* | parallel -I {} muscle -in {} -out {}_aligned.fasta	
+output/%aligned.fasta: output/*sd.fasta
+	ls output/*sd.fasta | parallel -I {} clustalw -TYPE=DNA -INFILE={} -OUTPUT=FASTA -OUTFILE={}_aligned.fasta	
 
+# trim sequences using trimal
+output/recovered_seqs/%fasta: output/*aligned.fasta
+	mkdir -p output/recovered_seqs
+	ls output/*aligned.fasta | parallel -I {} trimal -nogaps -in {} -out output/recovered_seqs/{}
 
 
 clean:
