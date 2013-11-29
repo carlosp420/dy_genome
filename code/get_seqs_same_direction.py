@@ -54,26 +54,41 @@ for line in lines:
     line = line.strip().split(",")
     if line[0] != line[1]:
         # direction of query and subject
-        if line[7] < line[8] and line[9] > line[10]:
+        if int(line[6]) < int(line[7]) and int(line[8]) > int(line[9]):
             # reverse
             record = reverse(line[0], infile)
             if record.id not in ids:
                 print "Appending reverse of %s" % str(line[0])
                 sequences.append(record)
                 ids.append(record.id)
-        elif line[7] > line[8] and line[9] < line[10]:
+                print "Appending unchanged of %s" % str(line[1])
+                record = get_this_sequence(line[1], infile)
+                sequences.append(record)
+                ids.append(record.id)
+                break
+        elif int(line[6]) > int(line[7]) and int(line[8]) < int(line[9]):
             # reverse
             record = reverse(line[0], infile)
             if record.id not in ids:
                 print "Appending reverse of %s" % str(line[0])
                 sequences.append(record)
                 ids.append(record.id)
+                print "Appending unchanged of %s" % str(line[1])
+                record = get_this_sequence(line[1], infile)
+                sequences.append(record)
+                ids.append(record.id)
+                break
         else:
             record = get_this_sequence(line[0], infile)
             if record.id not in ids:
                 print "Appendig unchanged %s" % str(line[0])
                 sequences.append(record)
                 ids.append(record.id)
+                print "Appending unchanged of %s" % str(line[1])
+                record = get_this_sequence(line[1], infile)
+                sequences.append(record)
+                ids.append(record.id)
+                break
 
 
 # write sequences to infile

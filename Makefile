@@ -15,7 +15,7 @@ pdf: clean $(PDFS)
 
 
 
-analysis: grefs/Bombyx_exons.fas data/DpleKU_DAS5_blastn_out.csv fig_blast_identity.png data/new_blastn_out.csv data/DpleKU_DAS5.fa output/gene*fasta grefs/Danaus_exons.fasta output/merged*fasta output/*aligned.fasta output/*trimmed output/recovered_genes/*fasta
+analysis: grefs/Bombyx_exons.fas data/DpleKU_DAS5_blastn_out.csv fig_blast_identity.png data/new_blastn_out.csv data/DpleKU_DAS5.fa output/gene*fasta grefs/Danaus_exons.fasta output/merged*fasta output/*aligned.fasta output/*trimmed output/recovered_genes/*fasta output/recovered_genes/mismatches.csv
 
 grefs/Bombyx_exons.fas: grefs/silkgenome.fa grefs/silkcds.fa grefs/OrthoDB7_Arthropoda_tabtext code/search_genes_from_Bmori.py
 	python code/search_genes_from_Bmori.py
@@ -68,6 +68,9 @@ output/recovered_genes/%fasta: output/*trimmed
 	ls output/*trimmed | parallel -I {} cp {} output/recovered_genes/{/}
 	rename 's/merged_gene_(.+):.+/$$1.fasta/g' output/recovered_genes/*
 
+# get mismatches between sequences
+output/recovered_genes/mismatches.csv: output/recovered_genes/*fasta code/compare_seqs.py
+	ls output/recovered_genes/*fasta | parallel -I {} python code/compare_seqs.py {} > output/recovered_genes/mismatches.csv
 
 clean:
 	rm -rf *pdf *docx
