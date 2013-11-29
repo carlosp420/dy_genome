@@ -15,7 +15,7 @@ pdf: clean $(PDFS)
 
 
 
-analysis: grefs/Bombyx_exons.fas data/DpleKU_DAS5_blastn_out.csv fig_blast_identity.png data/new_blastn_out.csv data/DpleKU_DAS5.fa output/gene*fasta grefs/Danaus_exons.fasta output/merged*fasta output/*aligned.fasta output/recovered_seqs/*fasta
+analysis: grefs/Bombyx_exons.fas data/DpleKU_DAS5_blastn_out.csv fig_blast_identity.png data/new_blastn_out.csv data/DpleKU_DAS5.fa output/gene*fasta grefs/Danaus_exons.fasta output/merged*fasta output/*aligned.fasta output/*trimmed output/recovered_genes/*fasta
 
 grefs/Bombyx_exons.fas: grefs/silkgenome.fa grefs/silkcds.fa grefs/OrthoDB7_Arthropoda_tabtext code/search_genes_from_Bmori.py
 	python code/search_genes_from_Bmori.py
@@ -60,9 +60,13 @@ output/%aligned.fasta: output/*sd.fasta
 	ls output/*sd.fasta | parallel -I {} clustalw -TYPE=DNA -INFILE={} -OUTPUT=FASTA -OUTFILE={}_aligned.fasta	
 
 # trim sequences using trimal
-output/recovered_seqs/%fasta: output/*aligned.fasta
-	mkdir -p output/recovered_seqs
-	ls output/*aligned.fasta | parallel -I {} trimal -nogaps -in {} -out output/recovered_seqs/{}
+output/%trimmed: output/*aligned.fasta
+	ls output/*aligned.fasta | parallel -I {} trimal -nogaps -in {} -out {}_trimmed
+
+output/recovered_genes/%fasta: output/*trimmed
+	mkdir -p output/recovered_genes
+	ls output/*trimmed | parallel -I {} cp {} output/recovered_genes/{/}
+	rename 's/merged_gene_(.+):.+/$$1.fasta/g' output/recovered_genes/*
 
 
 clean:
