@@ -54,7 +54,14 @@ for line in lines:
     line = line.strip().split(",")
     if line[0] != line[1]:
         # direction of query and subject
-        if int(line[7]) > int(line[8]):
+        if line[7] < line[8] and line[9] > line[10]:
+            # reverse
+            record = reverse(line[0], infile)
+            if record.id not in ids:
+                print "Appending reverse of %s" % str(line[0])
+                sequences.append(record)
+                ids.append(record.id)
+        elif line[7] > line[8] and line[9] < line[10]:
             # reverse
             record = reverse(line[0], infile)
             if record.id not in ids:
