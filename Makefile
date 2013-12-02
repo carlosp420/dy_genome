@@ -57,6 +57,7 @@ output/%sd.fasta: code/get_seqs_same_direction.py output/merged*fasta
 
 # align sequences
 output/%aligned.fasta: output/*sd.fasta
+	ls output/*sd.fasta | parallel -I {} sed -i 's/N/-/g' {}
 	ls output/*sd.fasta | parallel -I {} clustalw -TYPE=DNA -INFILE={} -OUTPUT=FASTA -OUTFILE={}_aligned.fasta	
 
 # trim sequences using trimal
